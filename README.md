@@ -243,4 +243,4 @@ BrandFlow-AI---Autonomous-Multi-Agent-Marketing-System/
 
 ## 👨‍💻 Author
 
-**Anukul Chandra** — AI & automation engineer focused on multi-agent systems and AI-powered marketing automation.
+**Anukul Chandra** — AI Engineer & Automation Expert
