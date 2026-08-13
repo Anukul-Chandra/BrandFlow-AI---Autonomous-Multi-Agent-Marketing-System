@@ -222,15 +222,6 @@ Company Memory → Marketing Idea → Campaign → Static Creative → Video
 
 Each step is handed to the next agent through a status-based Google Sheets queue, keyed by company and campaign ID.
 
-## 📁 Project Structure
-
-```
-BrandFlow-AI---Autonomous-Multi-Agent-Marketing-System/
-├── README.md                                   # Project documentation
-├── BrandFlow-AI-..._No_cred.json               # n8n workflow export (credentials stripped)
-└── images/
-    └── agents/                                 # Per-agent workflow screenshots
-```
 
 ## 🚀 Setup
 
