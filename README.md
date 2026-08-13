@@ -41,13 +41,19 @@ Beyond content production, the system operates the demand it creates. It respond
 
 ## Problem Statement
 
-Running marketing for multiple companies is dominated by repetitive, disconnected manual work:
+A client was looking for a way to automate a large part of their marketing and communication operations across multiple companies and platforms. Their team was generating marketing ideas and content, creating images and videos, publishing the same campaign separately on every social platform, running email marketing, and answering social media and website inquiries — all by hand, with no single source of truth.
 
-- **Slow, repetitive content production.** Every post requires a new idea, a caption, an image, a video, and hashtags — usually drafted by hand, one piece at a time, per platform.
-- **Fragmented tooling.** Copywriting, image generation, video generation, and scheduling live in separate tools, forcing constant copy-paste and manual hand-offs between them.
-- **Publishing complexity.** The same campaign must reach several platforms, each with its own accounts, formats, and posting requirements.
-- **Fragile brand consistency.** When copy, offers, and claims are composed ad-hoc, off-brand messaging and invented promises slip through — especially at scale.
-- **Multi-company chaos.** Teams serving many brands repeat the same process for every client and risk cross-company mixing of ideas, assets, and brand voice.
+The key challenges were:
+
+- Generating marketing ideas and content
+- Creating image and video content
+- Publishing across multiple social platforms
+- Managing email marketing
+- Responding to social media and website inquiries
+- Qualifying leads and scheduling appointments
+- Keeping each company's branding, information, links, and communication rules separate
+
+These activities were scattered across disconnected tools and processes, making them hard to scale and harder to keep consistent across brands. The client wanted everything brought together into one scalable system — one that could run the same pipeline for every company without ever mixing their branding, information, or communication rules.
 
 ## Solution
 
@@ -84,10 +90,6 @@ Six specialized agents run the system. Each owns one stage of the lifecycle — 
 
 ## Agent 1 — Idea Generation Agent
 
-<!-- AGENT 1 SCREENSHOT: idea-generation-agent.png
-Capture the n8n workflow section containing the Idea Generation Agent.
-The screenshot should clearly show the manual trigger, the per-company loop, the LLM chain, and the campaign row write-back.
--->
 ![Idea Generation Agent](./images/agents/idea-generation-agent.png)
 
 > Generates campaign, content, video and marketing ideas based on the selected company's brand memory.
@@ -101,11 +103,7 @@ The screenshot should clearly show the manual trigger, the per-company loop, the
 
 ## Agent 2 — Static Campaign Agent
 
-<!-- AGENT 2 SCREENSHOT: static-campaign-agent.png
-Capture the n8n workflow section containing the Static Campaign Agent.
-The screenshot should clearly show the sheets trigger, the caption/image-prompt LLM chain, the Gemini image node, and the logo compositing steps.
--->
-![Static Campaign Agent](./images/agents/static-campaign-agent.png)
+![Static Campaign Agent](./images/static-campaign-agent.png)
 
 > Turns a campaign idea into publish-ready static creative — captions, hashtags, and a generated image with the company logo overlaid.
 
@@ -116,47 +114,22 @@ The screenshot should clearly show the sheets trigger, the caption/image-prompt 
 
 ---
 
-## Agent 3 — Story-to-Video Agent
+## Agent 3 & 4 — Video Generation + Publishing Agent
 
-<!-- AGENT 3 SCREENSHOT: story-to-video-agent.png
-Capture the n8n workflow section containing the Story-to-Video Agent.
-The screenshot should clearly show the creative_ready trigger, the video-script LLM chain, the Kling generation call, and the status polling loop.
--->
-![Story-to-Video Agent](./images/agents/story-to-video-agent.png)
+![Video Generation + Publishing Agent](./images/agents/Video%20Genartion%20and%20Publishing%20Agent.png)
 
-> Turns static creative into a short AI-generated marketing video with a written, timed story.
+> Turns static creative into a short AI-generated marketing video and publishes every finished image and video to all connected social platforms.
 
 **Key responsibilities**
-- Writes a 10-second scene-by-scene script and a cinematic generation prompt
-- Renders the video with Kling AI and polls the job until it completes
-- Stores the MP4 and writes the video URL back to the campaign row
-
----
-
-## Agent 4 — Multiplatform Publishing Agent
-
-<!-- AGENT 4 SCREENSHOT: multiplatform-publishing-agent.png
-Capture the n8n workflow section containing the Multiplatform Publishing Agent.
-The screenshot should clearly show the image and video UploadPost nodes for all six platforms.
--->
-![Multiplatform Publishing Agent](./images/agents/multiplatform-publishing-agent.png)
-
-> Publishes every finished image and video to all connected social platforms in one step.
-
-**Key responsibilities**
-- Posts generated images to Facebook, Instagram, TikTok, X, Pinterest, and YouTube
-- Posts generated videos to the same six platforms
+- Writes a 10-second scene script and cinematic prompt, renders the video with Kling AI, and polls the job until it completes
+- Stores the MP4 and posts finished images and videos to Facebook, Instagram, TikTok, X, Pinterest, and YouTube
 - Routes posts across the connected publishing accounts
 
 ---
 
 ## Agent 5 — Email Marketing Agent
 
-<!-- AGENT 5 SCREENSHOT: email-marketing-agent.png
-Capture the n8n workflow section containing the Email Marketing Agent.
-The screenshot should clearly show the campaign generator, the Gmail send and reply steps, and the calendar booking branch.
--->
-![Email Marketing Agent](./images/agents/email-marketing-agent.png)
+![Email Marketing Agent](./images/agents/Email%20Marketting%20Agent.png)
 
 > Runs outbound email campaigns and answers inbound email, including booking appointments.
 
@@ -169,11 +142,7 @@ The screenshot should clearly show the campaign generator, the Gmail send and re
 
 ## Agent 6 — Social Media Response Agent
 
-<!-- AGENT 6 SCREENSHOT: social-media-response-agent.png
-Capture the n8n workflow section containing the Social Media Response Agent.
-The screenshot should clearly show the webhooks, the AI Agent with its tools, and the channel router with the reply senders.
--->
-![Social Media Response Agent](./images/agents/social-media-response-agent.png)
+![Social Media Response Agent](./images/agents/Social%20Media%20Response%20Agent.png)
 
 > Answers DMs and comments on Facebook and Instagram in the company's voice and turns interest into leads, bookings, and escalations.
 
@@ -193,8 +162,7 @@ flowchart TB
     subgraph Pipeline ["Content Pipeline"]
         A1["Idea Generation Agent"]
         A2["Static Campaign Agent"]
-        A3["Story-to-Video Agent"]
-        A4["Multiplatform Publishing Agent"]
+        A3["Agent 3 & 4 — Video Generation + Publishing Agent"]
     end
 
     SP["Social Platforms<br/>Facebook · Instagram · TikTok · X · Pinterest · YouTube"]
@@ -211,9 +179,8 @@ flowchart TB
     M --> A1
     A1 -->|"idea · pending_creative"| A2
     A2 -->|"creative_ready"| A3
-    A3 -->|"video"| A4
-    A2 -.->|"image"| A4
-    A4 --> SP
+    A2 -.->|"image"| A3
+    A3 --> SP
 
     SP -->|"DMs and comments"| E1
     E1 --> L1
@@ -227,7 +194,7 @@ flowchart TB
     M -.->|"company memory"| E2
 ```
 
-All six agents run as a single orchestrated n8n workflow. Company and campaign data lives in Google Sheets keyed by `company_id`, so every agent works from the correct brand memory and passes work downstream through status-based queues (`pending_creative` → `creative_ready`). The same pipeline is reused for every company — isolation comes from the shared memory layer, not from separate workflows.
+All agents run as a single orchestrated n8n workflow. Company and campaign data lives in Google Sheets keyed by `company_id`, so every agent works from the correct brand memory and passes work downstream through status-based queues (`pending_creative` → `creative_ready`). The same pipeline is reused for every company — isolation comes from the shared memory layer, not from separate workflows.
 
 ---
 
